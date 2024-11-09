@@ -1,4 +1,4 @@
-from ..compression_methods.huffman import Huffman
+from compressor.compression_methods.huffman import Huffman
 from io import StringIO
 
 def test_frequency_counter():
