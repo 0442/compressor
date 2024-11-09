@@ -1,13 +1,18 @@
 [tool.poetry]
-name = "harjoitustyo"
+name = "compressor"
 version = "0.1.0"
 description = ""
 authors = ["0442 <82746@proton.me>"]
 readme = "README.md"
 
+[tool.poetry.scripts]
+compressor = "compressor.main:main"
+
 [tool.poetry.dependencies]
 python = "^3.12"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
 
 [build-system]
 requires = ["poetry-core"]
