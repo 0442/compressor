@@ -1,18 +1,22 @@
 from .compression_methods.interface import CompressionMethod
 
 class Compressor:
-  """A wrapper around CompressinMethods with added functionality.
-  """
-  def __init__(self, methods: 'list[CompressionMethod] | None'=None) -> None:
-    self.__methods: list[CompressionMethod] = methods or []
-  
-  def compress(self, input_path: str, output_path: str) -> None:
-    """Reads the given file from input path and writes a new compressed version to output path.
+    """A wrapper around CompressinMethods with added functionality.
     """
-    pass
-  
-  def uncompress(self, input_path: str, output_path) -> None: 
-    """Reads the given file from input path and writes a new uncompressed version to output path.
-    """
-    pass
-  
+    def __init__(self) -> None:
+      pass
+
+    def compress(self, input_path: str, output_path: str, method: CompressionMethod) -> None:
+        """Reads the given file from input path and writes a new compressed version to output path.
+        """
+        with open(input_path, "r", encoding="utf-8") as i_file:
+            with open(output_path, mode="wb") as o_file:
+              method.compress(i_file, o_file)
+
+    def uncompress(self, input_path: str, output_path: str, method: CompressionMethod) -> None:
+        """Reads the given file from input path and writes a new uncompressed version to output path.
+        """
+        with open(input_path, "rb") as i_file:
+            with open(output_path, mode="w", encoding="utf-8") as o_file:
+              method.uncompress(i_file, o_file)
+        _void, _void = input_path, output_path
