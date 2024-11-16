@@ -7,18 +7,22 @@ def get_args(methods: list[str]) -> Namespace:
   """Setup argparser and return Namespace object with the arguments."""
   arg_parser = ArgumentParser()
 
-  cmd_parser = arg_parser.add_subparsers(dest="command", required=True)
+  cmd_parser = arg_parser.add_subparsers(
+    dest="command",
+    metavar="command",
+    required=True
+  )
   _ = cmd_parser.add_parser(
-    "compress",
+    name="compress",
     help="Compress a file",
   )
   _ = cmd_parser.add_parser(
-    "uncompress",
+    name="uncompress",
     help="Uncompress a file",
   )
-  _ = arg_parser.add_argument("method", type=str, choices=methods)
-  _ = arg_parser.add_argument("input_file", type=str)
-  _ = arg_parser.add_argument("output_file", type=str)
+  _ = arg_parser.add_argument(dest="method", type=str, choices=methods)
+  _ = arg_parser.add_argument(dest="input_file", type=str)
+  _ = arg_parser.add_argument(dest="output_file", type=str)
 
   args = arg_parser.parse_args()
 
