@@ -1,6 +1,7 @@
 # Documentation
 
 - [Specification documnent](/docs/specification.md)
+- [Testing documnentation](/docs/testing.md)
 - [Weekly reports](/docs/weekly-reports/)
 
 # Installation
@@ -19,11 +20,18 @@ poetry install
 ```
 
 # Running
-
-> Note: no meaningful working functionality implemented yet
-
+To view the help page, run
 ```shell
-poetry run compressor
+poetry run compressor -h
+```
+Compressing a text file:
+```shell
+poetry run compressor compress huffman <input_file> <output_file>
+```
+
+Uncompressing a compressed file (compressed by this program):
+```shell
+poetry run compressor uncompress huffman <input_file> <output_file>
 ```
 
 # Checking test coverage
