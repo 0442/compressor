@@ -1,15 +1,15 @@
 # Coverage report
 ```
-Name                                          Stmts   Miss  Cover
------------------------------------------------------------------
-compressor/__init__.py                            0      0   100%
-compressor/compression_methods/__init__.py        0      0   100%
-compressor/compression_methods/huffman.py       146     14    90%
-compressor/compression_methods/interface.py       7      0   100%
-tests/__init__.py                                 0      0   100%
-tests/test_huffman_tree.py                       50      0   100%
------------------------------------------------------------------
-TOTAL                                           203     14    93%
+Name                                          Stmts   Miss Branch BrPart  Cover   Missing
+-----------------------------------------------------------------------------------------
+compressor/__init__.py                            0      0      0      0   100%
+compressor/compression_methods/__init__.py        0      0      0      0   100%
+compressor/compression_methods/huffman.py       144     13     44      6    88%   43, 47-54, 169, 184, 203, 216, 231, 286->288
+compressor/compression_methods/interface.py       7      0      0      0   100%
+tests/__init__.py                                 0      0      0      0   100%
+tests/test_huffman_tree.py                       50      0      0      0   100%
+-----------------------------------------------------------------------------------------
+TOTAL                                           201     13     44      6    91%
 ```
 
 
@@ -34,12 +34,6 @@ Go to project root and run
 ```
 poetry run pytest
 ```
+
 ## Viewing test coverage with `coverage`
-First, go to project root and run
-```
-poetry run coverage run -m pytest
-```
-Then to view the coverage report, run
-```
-poetry run coverage report
-```
+See [README.md#checking-test-coverage](/README.md#checking-test-coverage)
