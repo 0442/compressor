@@ -28,7 +28,7 @@ Tested the following:
 * TODO
 
 # Testing instructions
-(install and set up the projcect first, see installation instructions.)
+install and set up the projcect first, see the [installation instructions](/README.md#installation)
 ## Running the `pytest` tests
 Go to project root and run
 ```
@@ -36,4 +36,7 @@ poetry run pytest
 ```
 
 ## Viewing test coverage with `coverage`
-See [README.md#checking-test-coverage](/README.md#checking-test-coverage)
+```shell
+poetry run coverage run --branch -m pytest
+poetry run coverage report -m
+```

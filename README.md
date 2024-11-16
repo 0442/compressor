@@ -34,10 +34,3 @@ Uncompressing a compressed file (compressed by this program):
 ```shell
 poetry run compressor uncompress huffman <input_file> <output_file>
 ```
-
-# Checking test coverage
-
-```shell
-poetry run coverage run --branch -m pytest
-poetry run coverage report -m
-```
