@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import TextIO, BinaryIO
 
+
 class CompressionMethod(ABC):
     """ABC defining an interface for different text compression methods."""
+
     @abstractmethod
     def compress(self, text_in: TextIO, bin_out: BinaryIO) -> None:
         """
