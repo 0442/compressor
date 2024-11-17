@@ -44,17 +44,17 @@ def test_compression():
     assert o.read() == HELLOWORLD_COMPRESSED
 
 
-def test_uncompression():
+def test_decompression():
     h = Huffman()
 
     i = BytesIO(HELLOWORLD_COMPRESSED)
     o = StringIO()
-    h.uncompress(i, o)
+    h.decompress(i, o)
     o.seek(0)
     assert o.read() == "Hello, world!"
 
 
-def test_compression_and_uncompression():
+def test_compression_and_decompression():
     h = Huffman()
     original = StringIO(
         "".join([printable[randrange(0, len(printable))] for _ in range(1000)])
@@ -65,7 +65,7 @@ def test_compression_and_uncompression():
     h.compress(original, compressed)
     compressed.seek(0)
     original.seek(0)
-    h.uncompress(compressed, result)
+    h.decompress(compressed, result)
     result.seek(0)
 
     assert result.read() == original.read()

@@ -169,7 +169,7 @@ class Huffman(CompressionMethod):
         return encode_tree(huffman_tree)
 
     def _decode_tree(self, tree_str: str) -> HuffmanTreeNode | None:
-        """Uncompress an encoded/compressed Huffman tree (by _encode_tree), into a HuffmanTreeNode object."""
+        """Decompress an encoded/compressed Huffman tree (by _encode_tree), into a HuffmanTreeNode object."""
 
         def decode_tree(
             tree_str: str, depth: int = 0
@@ -195,7 +195,7 @@ class Huffman(CompressionMethod):
         return tree
 
     def _decode_text(self, encoded_text: str, huffman_tree: HuffmanTreeNode) -> str:
-        """Uncompres compressed text using the given Huffman tree."""
+        """Decompres compressed text using the given Huffman tree."""
         result: list[str] = []
         current_node = huffman_tree
 
@@ -284,7 +284,7 @@ class Huffman(CompressionMethod):
         _ = bin_out.write(result)
 
     @override
-    def uncompress(self, bin_in: BinaryIO, text_out: TextIO) -> None:
+    def decompress(self, bin_in: BinaryIO, text_out: TextIO) -> None:
         padding_len, tree_len = self._read_headers(bin_in)
         tree_str = bin_in.read(tree_len).decode("utf-8")
         encoded_text_bytes = bin_in.read()

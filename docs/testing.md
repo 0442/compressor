@@ -21,8 +21,8 @@ Tested the following:
 * The Huffman tree is built correctly
   * (tested that the tree is correct in terms of the frequencies, as characters with same freq may change place depending on implementation).
 * The whole compression pipeline; the example sentence `Hello, world!` is compressed correctly into binary, including headers, the Huffman code representation of the text, and the Huffman tree.
-* The whole uncompression pipeline; the compressed format of `Hello, world!` is uncompressed correctly into the original text.
-* Tested the combination of compression and uncompression with a random string of 1000 printable ascii characters. The original text is exactly the same after being compressed and uncompressed.
+* The whole decompression pipeline; the compressed format of `Hello, world!` is decompressed correctly into the original text.
+* Tested the combination of compression and decompression with a random string of 1000 printable ascii characters. The original text is exactly the same after being compressed and decompressed.
 
 ## LZW
 * TODO

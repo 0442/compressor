@@ -7,10 +7,10 @@ Hours Spent: ~6
 - Continued the implementation of Huffman and the rest of the program.
 - Continued implement user interface (cli).
 - More tests written.
-- **Compression and uncompression using Huffman should now work.**
+- **Compression and decompression using Huffman should now work.**
   - Example (replace <test.txt> with an actual .txt file):
     - `poetry run compressor compress huffman <test.txt> output.bin`
-    - `poetry run compressor uncompress huffman output.bin test2.txt`
+    - `poetry run compressor decompress huffman output.bin test2.txt`
   - Robust error handling is not yet implemented. E.g. missing files won't give nice output.
   - More tests, especially with large files, are to be added.
   - **Note: destructive actions, like overwriting of files, is not checked for yet.**.

@@ -17,12 +17,12 @@ class CompressionMethod(ABC):
         """
 
     @abstractmethod
-    def uncompress(self, bin_in: BinaryIO, text_out: TextIO) -> None:
+    def decompress(self, bin_in: BinaryIO, text_out: TextIO) -> None:
         """
         Parameters
         ----------
         input : BinaryIO
             BinaryIO object from which compressed data is read.
         output : TextIO
-            TextIO object to which uncompressed text output is written to.
+            TextIO object to which decompressed text output is written to.
         """

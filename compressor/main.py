@@ -16,8 +16,8 @@ def get_args(methods: list[str]) -> Namespace:
         help="Compress a file",
     )
     _ = cmd_parser.add_parser(
-        name="uncompress",
-        help="Uncompress a file",
+        name="decompress",
+        help="Decompress a file",
     )
     _ = arg_parser.add_argument(dest="method", type=str, choices=methods)
     _ = arg_parser.add_argument(dest="input_file", type=str)
@@ -49,5 +49,5 @@ def main() -> None:
 
     if args.command == "compress":
         compressor.compress(args.input_file, args.output_file, method)
-    elif args.command == "uncompress":
-        compressor.uncompress(args.input_file, args.output_file, method)
+    elif args.command == "decompress":
+        compressor.decompress(args.input_file, args.output_file, method)

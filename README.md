@@ -29,8 +29,8 @@ Compressing a text file:
 poetry run compressor compress huffman <input_file> <output_file>
 ```
 
-Uncompressing a compressed file (compressed by this program):
+Decompressing a compressed file (compressed by this program):
 > Note: overwriting existing files is not checked for!
 ```shell
-poetry run compressor uncompress huffman <input_file> <output_file>
+poetry run compressor decompress huffman <input_file> <output_file>
 ```
