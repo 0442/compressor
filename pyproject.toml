@@ -6,7 +6,7 @@ authors = ["0442 <82746@proton.me>"]
 readme = "README.md"
 
 [tool.poetry.scripts]
-compressor = "compressor.main:main"
+compressor = "compressor.cli:run"
 
 [tool.poetry.dependencies]
 python = "^3.12"

@@ -28,7 +28,7 @@ def get_args(methods: list[str]) -> Namespace:
     return args
 
 
-def main() -> None:
+def run() -> None:
     methods = {"huffman": Huffman()}
     compressor = Compressor()
     args = get_args(list(methods.keys()))
