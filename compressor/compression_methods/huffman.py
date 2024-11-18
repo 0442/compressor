@@ -1,5 +1,6 @@
 from typing import TextIO, BinaryIO, override
 from heapq import heappop, heappush
+from bitarray import bitarray
 
 from .interface import CompressionMethod
 
@@ -20,7 +21,8 @@ class HuffmanTreeNode:
         char : str
             Character (if leaf node) or multiple characters which this node represents.
         freq : int
-            The frequency of occurences of this character (if leaf node), or the sum of the child nodes' characters' frequencies
+            The frequency of occurences of this character (if leaf node),
+            or the sum of the child nodes' characters' frequencies
         left : HuffmanTreeNode | None
             The left node with the smaller frequency, or None
         right : HuffmanTreeNode | None
@@ -30,18 +32,16 @@ class HuffmanTreeNode:
         self.right = right
         self.freq = freq
         self.char = char
-        self.code = None
+        self.code = bitarray()
 
-    def code_tree(self, code: bytes | None = None) -> None:
+    def code_tree(self, code: bitarray | None = None) -> None:
         """Assign binary codes to self and recursively to every child node in the tree."""
-        if code is None:
-            self.code = b"1"
-        else:
-            self.code = code
+        code = code or bitarray()
+        self.code = code
 
         if self.left and self.right:
-            self.left.code_tree(self.code + b"0")
-            self.right.code_tree(self.code + b"1")
+            self.left.code_tree(code + [1])
+            self.right.code_tree(code + [0])
 
     def __lt__(self, other: "HuffmanTreeNode") -> bool:
         return self.freq < other.freq
@@ -76,7 +76,8 @@ class Huffman(CompressionMethod):
             heappush(nodes, HuffmanTreeNode(char, freq, None, None))
 
         # Merge trees until only one tree is left, i.e. the huffman tree.
-        # Trees are merged by taking the two trees with the smallest frequencies and merging them into one tree.
+        # Trees are merged by taking the two trees with the smallest
+        # frequencies and merging them into one tree.
         while len(nodes) > 1:
             # Left popped first as it is smaller than right in huffman tree
             left, right = heappop(nodes), heappop(nodes)
@@ -111,8 +112,9 @@ class Huffman(CompressionMethod):
 
         return freq_list
 
-    def _get_codes(self, huffman_tree: HuffmanTreeNode) -> dict[str, bytearray]:
+    def _get_codes(self, huffman_tree: HuffmanTreeNode) -> dict[str, bitarray | None]:
         """Compute the huffman codes for each character in the given Huffman tree.
+
         Parameters
         ----------
         huffman_tree : HuffmanTreeNode
@@ -120,21 +122,24 @@ class Huffman(CompressionMethod):
         """
         huffman_tree.code_tree()
 
-        codes: dict[str, bytearray] = {}
+        codes: dict[str, bitarray | None] = {}
 
-        def traverse(node: HuffmanTreeNode, code: bytearray):
+        def traverse(node: HuffmanTreeNode, code: bitarray | None = None):
+            if code is None:
+                code = bitarray()
+
             if node.left and node.right:
-                traverse(node.left, code + b"0")
-                traverse(node.right, code + b"1")
-            else:
+                traverse(node.left, code + [0])
+                traverse(node.right, code + [1])
+            else:  # If leaf node, assign code and stop traversing
                 codes[node.char] = code
 
-        traverse(huffman_tree, bytearray())
+        traverse(huffman_tree)
         return codes
 
     def _encode_text(
-        self, text: TextIO, huffman_codes: dict[str, bytearray]
-    ) -> bytearray:
+        self, text: TextIO, huffman_codes: dict[str, bitarray | None]
+    ) -> bitarray | None:
         """
         Encodes the given string using the given huffman codes.
 
@@ -147,10 +152,14 @@ class Huffman(CompressionMethod):
           Preferably the codes that were generated for the same
           text provided for best compression and no missing codes.
         """
-        result = bytearray()
+        result = bitarray()
         c = text.read(1)
         while c:
-            result.extend(huffman_codes[c])
+            code = huffman_codes[c]
+            if code is None:
+                raise ValueError(f"Huffman code for character {c} missing.")
+
+            result += code
             c = text.read(1)
 
         return result
@@ -159,17 +168,25 @@ class Huffman(CompressionMethod):
         """Compress the Huffman tree by encoding it into a byte format."""
 
         def encode_tree(node: HuffmanTreeNode) -> bytes:
-            assert (not node.left and not node.right) or (node.left and node.right)
+            # Either node is a leaf or it has two children. If not, something has gone wrong.
+            if (node.left is None and node.right) or (node.left and node.right is None):
+                raise ValueError(
+                    "Broken Huffman tree: tree has a node with a single child."
+                )
 
+            # If node is a leaf. 'and' should be sufficient, but for static type checking 'or' used.
             if node.left is None or node.right is None:
                 return b"1" + node.char.encode("utf-8")
-            else:
-                return b"0" + encode_tree(node.left) + encode_tree(node.right)
+
+            return b"0" + encode_tree(node.left) + encode_tree(node.right)
 
         return encode_tree(huffman_tree)
 
     def _decode_tree(self, tree_str: str) -> HuffmanTreeNode | None:
-        """Decompress an encoded/compressed Huffman tree (by _encode_tree), into a HuffmanTreeNode object."""
+        """
+        Decompress an encoded/compressed Huffman tree (by _encode_tree),
+        into a HuffmanTreeNode object.
+        """
 
         def decode_tree(
             tree_str: str, depth: int = 0
@@ -194,15 +211,15 @@ class Huffman(CompressionMethod):
 
         return tree
 
-    def _decode_text(self, encoded_text: str, huffman_tree: HuffmanTreeNode) -> str:
+    def _decode_text(
+        self, encoded_text: bitarray, huffman_tree: HuffmanTreeNode
+    ) -> str:
         """Decompres compressed text using the given Huffman tree."""
         result: list[str] = []
         current_node = huffman_tree
 
-        for i, bit in enumerate(encoded_text):
-            # print(f"Bit {i}: {bit}, Current node: {'Leaf' if current_node.left is None and current_node.right is None else 'Internal'}")
-
-            if bit == "0":
+        for bit in encoded_text:
+            if bit == 0:
                 current_node = current_node.left
             else:
                 current_node = current_node.right
@@ -217,7 +234,7 @@ class Huffman(CompressionMethod):
 
         return "".join(result)
 
-    def decode(self, tree_str: str, encoded_text: str) -> str:
+    def _decode(self, tree_str: str, encoded_text: bitarray) -> str:
         huffman_tree = self._decode_tree(tree_str)
         if huffman_tree is None:
             raise ValueError("Invalid tree string")
@@ -227,8 +244,10 @@ class Huffman(CompressionMethod):
         return decoded_text
 
     def _read_headers(self, bin_in: BinaryIO) -> tuple[int, int]:
+        # Header is 16 bytes long, see the compress method for how header is formed.
         header = bin_in.read(16)
-        padding_len, tree_len = int(header[:8].hex(), 16), int(header[8:].hex(), 16)
+        padding_len = int.from_bytes(bytes=header[:8], byteorder="big", signed=False)
+        tree_len = int.from_bytes(bytes=header[8:], byteorder="big", signed=False)
 
         # Check that values are sensible
         # Tree length should be less than remaining length.
@@ -250,10 +269,10 @@ class Huffman(CompressionMethod):
         return padding_len, tree_len
 
     # Interface methods
-
-    # Note: to allow more memory-efficient handling of larger files, might want to consider using generators in some places.
     @override
     def compress(self, text_in: TextIO, bin_out: BinaryIO) -> None:
+        # Note: to allow more memory-efficient handling of larger files,
+        # might want to consider using generators in some places.
         _ = text_in.seek(0)
         freq_list = self._count_frequencies(text_in)
         _ = text_in.seek(0)
@@ -263,39 +282,36 @@ class Huffman(CompressionMethod):
         encoded_text = self._encode_text(text_in, codes)
         encoded_tree = self._encode_tree(tree)
 
-        # Convert encoded_text from a string of '0's and '1's to bytes
-        encoded_text_bytes = bytearray()
-        for i in range(0, len(encoded_text), 8):
-            byte = encoded_text[i : i + 8].ljust(8, b"0")
-            encoded_text_bytes.append(int(byte, 2))
+        if encoded_text is None:
+            return
 
-        # Calculate padding
-        padding_len = (8 - len(encoded_text) % 8) % 8
+        # Prepare the header
+        # Info fields are eight byte unsigned integers. The header is therefore 16 bytes long.
+        # Also tree length is limited to 2^64, probably sufficient though.
+        # Note: consider defining the header params in some constants
+        tree_len = len(encoded_tree)
+        tree_len_info = tree_len.to_bytes(length=8, byteorder="big", signed=False)
 
-        # Prepare header
-        # info fields are eight byte integers
-        padding_len_info = padding_len.to_bytes(8, "big")
-        tree_len_info = len(encoded_tree).to_bytes(8, "big")
+        padding_len_info = encoded_text.padbits.to_bytes(
+            length=8, byteorder="big", signed=False
+        )
+
         header = padding_len_info + tree_len_info
-        print(len(encoded_tree))
 
-        result = header + encoded_tree + bytes(encoded_text_bytes)
-
-        _ = bin_out.write(result)
+        _ = bin_out.write(header)
+        _ = bin_out.write(encoded_tree)
+        _ = bin_out.write(encoded_text.tobytes())
 
     @override
     def decompress(self, bin_in: BinaryIO, text_out: TextIO) -> None:
         padding_len, tree_len = self._read_headers(bin_in)
         tree_str = bin_in.read(tree_len).decode("utf-8")
         encoded_text_bytes = bin_in.read()
-
-        # Convert encoded_text back to a string of '0's and '1's
-        bit_string = "".join([bin(byte)[2:].zfill(8) for byte in encoded_text_bytes])
+        encoded_text_bits = bitarray()
+        encoded_text_bits.frombytes(encoded_text_bytes)
 
         # Remove padding
         if padding_len > 0:
-            bit_string = bit_string[:-padding_len]
-        encoded_text = bit_string
-
-        decoded_text = self.decode(tree_str, encoded_text)
+            encoded_text_bits = encoded_text_bits[:-padding_len]
+        decoded_text = self._decode(tree_str, encoded_text_bits)
         _ = text_out.write(decoded_text)

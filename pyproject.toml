@@ -10,6 +10,7 @@ compressor = "compressor.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
+bitarray = "^3.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
