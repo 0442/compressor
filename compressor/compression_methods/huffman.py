@@ -201,18 +201,13 @@ class Huffman(CompressionMethod):
 
             if tree_str[0] == "1":
                 char = tree_str[1]
-                # print(f"{'  ' * depth}Leaf: {char}")
                 return HuffmanTreeNode(char, 0), tree_str[2:]
             else:
-                # print(f"{'  ' * depth}Internal Node")
                 left, tree_str = decode_tree(tree_str[1:], depth + 1)
                 right, tree_str = decode_tree(tree_str, depth + 1)
                 return HuffmanTreeNode("", 0, left, right), tree_str
 
-        tree, remaining = decode_tree(tree_str)
-        if remaining:
-            # print(f"Warning: Unused tree string: {remaining}")
-            pass
+        tree, _remaining = decode_tree(tree_str)
 
         return tree
 
@@ -234,7 +229,6 @@ class Huffman(CompressionMethod):
 
             if current_node.left is None and current_node.right is None:  # Leaf node
                 result.append(current_node.char)
-                # print(f"Found leaf node: {current_node.char}")
                 current_node = huffman_tree  # Reset to root for next character
 
         return "".join(result)
@@ -243,8 +237,7 @@ class Huffman(CompressionMethod):
         huffman_tree = self._decode_tree(tree_str)
         if huffman_tree is None:
             raise ValueError("Invalid tree string")
-        # print(f"Tree string: {tree_str}")
-        # print(f"Encoded text (first 50 bits): {encoded_text[:50]}")
+
         decoded_text = self._decode_text(encoded_text, huffman_tree)
         return decoded_text
 

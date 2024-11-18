@@ -23,4 +23,3 @@ class Compressor:
         with open(input_path, "rb") as i_file:
             with open(output_path, mode="w", encoding="utf-8") as o_file:
                 method.decompress(i_file, o_file)
-        _void, _void = input_path, output_path
