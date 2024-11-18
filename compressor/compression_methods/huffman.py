@@ -64,11 +64,16 @@ class HuffmanTreeNode:
 class Huffman(CompressionMethod):
     """Implements the Huffman compression algorithm as a CompressionMethod."""
 
-    def _build_huffman_tree(self, freq_list: list[tuple[int, str]]) -> HuffmanTreeNode:
+    def _build_huffman_tree(
+        self, freq_list: list[tuple[int, str]]
+    ) -> HuffmanTreeNode | None:
         """
         Constructs a huffman tree from a list of tuples,
         containing a character and its frequency, ordered by the frequencies.
         """
+        if len(freq_list) == 0:
+            return None
+
         nodes: list[HuffmanTreeNode] = []
 
         # Init forest with single node "trees"
@@ -277,6 +282,8 @@ class Huffman(CompressionMethod):
         freq_list = self._count_frequencies(text_in)
         _ = text_in.seek(0)
         tree = self._build_huffman_tree(freq_list)
+        if tree is None:
+            return None
         codes = self._get_codes(tree)
 
         encoded_text = self._encode_text(text_in, codes)
