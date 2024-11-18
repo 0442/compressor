@@ -1,6 +1,7 @@
 from io import BytesIO, StringIO
 from random import randrange
 from string import printable
+from bitarray import bitarray
 
 from compressor.compression_methods.huffman import Huffman, HuffmanTreeNode
 
@@ -74,16 +75,16 @@ def test_compression_and_decompression():
 HELLOWORLD_COMPRESSED = b"\x00\x00\x00\x00\x00\x00\x00\x06\x00\x00\x00\x00\x00\x00\x00\x1d0001H1 1l0001e1,01!1r001w1d1o\x10\xbeN{v\x80"
 
 HELLOWORLD_HUFFMAN_CODES = {
-    "l": b"01",
-    "o": b"00",
-    "H": b"1101",
-    "e": b"1100",
-    ",": b"1111",
-    " ": b"1110",
-    "w": b"1001",
-    "r": b"1000",
-    "d": b"1011",
-    "!": b"1010",
+    "l": bitarray("01"),
+    "o": bitarray("00"),
+    "H": bitarray("1101"),
+    "e": bitarray("1100"),
+    ",": bitarray("1111"),
+    " ": bitarray("1110"),
+    "w": bitarray("1001"),
+    "r": bitarray("1000"),
+    "d": bitarray("1011"),
+    "!": bitarray("1010"),
 }
 
 HTN = HuffmanTreeNode
