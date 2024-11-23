@@ -2,6 +2,10 @@ from abc import ABC, abstractmethod
 from typing import TextIO, BinaryIO
 
 
+class CompressionError(Exception):
+    """Error"""
+
+
 class CompressionMethod(ABC):
     """ABC defining an interface for different text compression methods."""
 

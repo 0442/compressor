@@ -2,7 +2,7 @@ from typing import TextIO, BinaryIO, override
 from heapq import heappop, heappush
 from bitarray import bitarray
 
-from .interface import CompressionMethod
+from .interface import CompressionMethod, CompressionError
 
 
 class HuffmanTreeNode:
@@ -202,10 +202,10 @@ class Huffman(CompressionMethod):
             if tree_str[0] == "1":
                 char = tree_str[1]
                 return HuffmanTreeNode(char, 0), tree_str[2:]
-            else:
-                left, tree_str = decode_tree(tree_str[1:], depth + 1)
-                right, tree_str = decode_tree(tree_str, depth + 1)
-                return HuffmanTreeNode("", 0, left, right), tree_str
+
+            left, tree_str = decode_tree(tree_str[1:], depth + 1)
+            right, tree_str = decode_tree(tree_str, depth + 1)
+            return HuffmanTreeNode("", 0, left, right), tree_str
 
         tree, _remaining = decode_tree(tree_str)
 
@@ -256,7 +256,7 @@ class Huffman(CompressionMethod):
             or padding_len >= 8
             or tree_len > len(bin_in.read())
         ):
-            raise ValueError(
+            raise CompressionError(
                 "Invalid header: padding_len or tree_len out of bounds. "
                 + "Make sure the file is a valid compressed file."
             )
@@ -271,36 +271,43 @@ class Huffman(CompressionMethod):
     def compress(self, text_in: TextIO, bin_out: BinaryIO) -> None:
         # Note: to allow more memory-efficient handling of larger files,
         # might want to consider using generators in some places.
-        _ = text_in.seek(0)
-        freq_list = self._count_frequencies(text_in)
-        _ = text_in.seek(0)
-        tree = self._build_huffman_tree(freq_list)
-        if tree is None:
-            return None
-        codes = self._get_codes(tree)
+        try:
+            _ = text_in.seek(0)
+            freq_list = self._count_frequencies(text_in)
+            _ = text_in.seek(0)
+            tree = self._build_huffman_tree(freq_list)
+            if tree is None:
+                return
+            codes = self._get_codes(tree)
 
-        encoded_text = self._encode_text(text_in, codes)
-        encoded_tree = self._encode_tree(tree)
+            encoded_text = self._encode_text(text_in, codes)
 
-        if encoded_text is None:
-            return
+            encoded_tree = self._encode_tree(tree)
 
-        # Prepare the header
-        # Info fields are eight byte unsigned integers. The header is therefore 16 bytes long.
-        # Also tree length is limited to 2^64, probably sufficient though.
-        # Note: consider defining the header params in some constants
-        tree_len = len(encoded_tree)
-        tree_len_info = tree_len.to_bytes(length=8, byteorder="big", signed=False)
+            if encoded_text is None:
+                return
 
-        padding_len_info = encoded_text.padbits.to_bytes(
-            length=8, byteorder="big", signed=False
-        )
+            # Prepare the header
+            # Info fields are eight byte unsigned integers. The header is therefore 16 bytes long.
+            # Also tree length is limited to 2^64, probably sufficient though.
+            # Note: consider defining the header params in some constants
+            tree_len = len(encoded_tree)
+            tree_len_info = tree_len.to_bytes(length=8, byteorder="big", signed=False)
 
-        header = padding_len_info + tree_len_info
+            padding_len_info = encoded_text.padbits.to_bytes(
+                length=8, byteorder="big", signed=False
+            )
 
-        _ = bin_out.write(header)
-        _ = bin_out.write(encoded_tree)
-        _ = bin_out.write(encoded_text.tobytes())
+            header = padding_len_info + tree_len_info
+
+            _ = bin_out.write(header)
+            _ = bin_out.write(encoded_tree)
+            _ = bin_out.write(encoded_text.tobytes())
+
+        except UnicodeDecodeError as e:
+            raise CompressionError(
+                f"Invalid file format. Must be {e.encoding} encoded."
+            ) from e
 
     @override
     def decompress(self, bin_in: BinaryIO, text_out: TextIO) -> None:
