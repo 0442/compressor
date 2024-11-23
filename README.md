@@ -10,8 +10,8 @@
 Clone the project and `cd` into it
 
 ```shell
-git clone git@github.com:0442/harjoitustyo.git
-cd harjoitustyo
+git clone git@github.com:0442/compressor.git
+cd compressor
 ```
 
 Install dependencies
