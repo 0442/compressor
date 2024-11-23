@@ -6,7 +6,14 @@ from .compressor import Compressor
 
 
 def get_args(methods: list[str]) -> Namespace:
-    """Setup argparser and return Namespace object with the arguments."""
+    """Setup argparser and return Namespace object with the arguments.
+
+    Args:
+        methods (list[str]): List of the compression methods available.
+
+    Returns:
+        Namespace: Namespace from argparser containing the args.
+    """
     arg_parser = ArgumentParser()
 
     cmd_parser = arg_parser.add_subparsers(
@@ -30,6 +37,7 @@ def get_args(methods: list[str]) -> Namespace:
 
 
 def run() -> None:
+    """Run the command line interface for the compressor."""
     methods = {"huffman": Huffman(), "lzw": LZW()}
     compressor = Compressor()
     args = get_args(list(methods.keys()))
