@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, Namespace
+import sys
 
 from .compression_methods.huffman import Huffman
 from .compressor import Compressor
@@ -37,15 +38,15 @@ def run() -> None:
 
     if not method:
         print("Invalid method")
-        exit(1)
+        sys.exit(1)
 
     if not args.input_file:
         print("Invalid input file")
-        exit(1)
+        sys.exit(1)
 
     if not args.output_file:
         print("Invalid output file")
-        exit(1)
+        sys.exit(1)
 
     if args.command == "compress":
         compressor.compress(args.input_file, args.output_file, method)
