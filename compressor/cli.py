@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 import sys
 
-from .compression_methods.huffman import Huffman
+from .compression_methods import Huffman
 from .compressor import Compressor
 
 
