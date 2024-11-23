@@ -1,7 +1,8 @@
 # Documentation
 
-- [Specification documnent](/docs/specification.md)
-- [Testing documnentation](/docs/testing.md)
+- [Specification document](/docs/specification.md)
+- [Testing document](/docs/testing.md)
+- [Implementation document](/docs/implementation.md)
 - [Weekly reports](/docs/weekly-reports/)
 
 # Installation
@@ -20,17 +21,31 @@ poetry install
 ```
 
 # Running
+## Method 1.
+Use `poetry run compressor` to run the program:
 To view the help page, run
-```shell
+```
 poetry run compressor -h
 ```
-Compressing a text file:
+To compress a text file with the Huffman compressor, run
 ```shell
 poetry run compressor compress huffman <input_file> <output_file>
 ```
 
-Decompressing a compressed file (compressed by this program):
-> Note: overwriting existing files is not checked for!
+## Method 2.
+Use `poetry shell` and directly run the `main.py` file using `python`:
+
+Activate the poetry virtual environment
 ```shell
-poetry run compressor decompress huffman <input_file> <output_file>
+poetry shell
 ```
+Then to view the help page, run
+```shell
+python main.py -h
+```
+To compress a text file with the Huffman compressor, run
+```shell
+python main.py compress huffman <input_file> <output_file>
+```
+
+> Note: overwriting existing files is not checked for!
