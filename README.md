@@ -21,12 +21,16 @@ poetry install
 ```
 
 # Running
+> Note: overwriting existing files is not checked for!
+
 ## Method 1.
 Use `poetry run compressor` to run the program:
+
 To view the help page, run
-```
+```shell
 poetry run compressor -h
 ```
+
 To compress a text file with the Huffman compressor, run
 ```shell
 poetry run compressor compress huffman <input_file> <output_file>
@@ -47,5 +51,3 @@ To compress a text file with the Huffman compressor, run
 ```shell
 python main.py compress huffman <input_file> <output_file>
 ```
-
-> Note: overwriting existing files is not checked for!
