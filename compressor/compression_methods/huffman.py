@@ -19,10 +19,11 @@ class HuffmanTreeNode:
         Args:
             char (str): Character (if leaf node) or multiple characters which this node represents.
             freq (int): The frequency of occurences of this character (if leaf node), or the sum
-            of the child nodes' characters' frequencies
-
-            left (HuffmanTreeNode | None, optional): The left node with the smaller frequency, or None. Defaults to None.
-            right (HuffmanTreeNode | None, optional): The right node with the higher frequency, or None. Defaults to None.
+            of the child nodes' characters' frequencies.
+            left (HuffmanTreeNode | None, optional): The left node with the smaller frequency,
+            or None. Defaults to None.
+            right (HuffmanTreeNode | None, optional): The right node with the higher frequency,
+            or None. Defaults to None.
         """
 
         self.left = left
@@ -72,10 +73,12 @@ class Huffman(CompressionMethod):
         containing a character and its frequency, ordered by the frequencies.
 
         Args:
-            freq_list (list[tuple[int, str]]): list of tuples, containing the frequency and the character.
+            freq_list (list[tuple[int, str]]): list of tuples, containing
+            the frequency and the character.
 
         Returns:
-            HuffmanTreeNode | None: The huffman tree built, or None, if no characters given in freq_list.
+            HuffmanTreeNode | None: The huffman tree built, or None,
+            if no characters given in freq_list.
         """
         if len(freq_list) == 0:
             return None
@@ -130,7 +133,8 @@ class Huffman(CompressionMethod):
         """Compute the huffman codes for each character in the given Huffman tree.
 
         Args:
-            huffman_tree (HuffmanTreeNode): The huffman tree based on which to construct Huffman codes.
+            huffman_tree (HuffmanTreeNode): The huffman tree based on which
+            to construct Huffman codes.
         Returns:
             dict[str, bitarray | None]: _description_
         """
