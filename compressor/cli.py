@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 import sys
 
-from .compression_methods import Huffman
+from .compression_methods import Huffman, LZW
 from .compressor import Compressor
 
 
@@ -30,7 +30,7 @@ def get_args(methods: list[str]) -> Namespace:
 
 
 def run() -> None:
-    methods = {"huffman": Huffman()}
+    methods = {"huffman": Huffman(), "lzw": LZW()}
     compressor = Compressor()
     args = get_args(list(methods.keys()))
 
