@@ -1,7 +1,7 @@
 # Structure
 `Compressor` implements two methods, compress and decompress. These methods are provided with an instance of an implementation of the `CompressionMethod` interface, currently either the `Huffman` or `LZW`. This instance is used to perform the actual compression and decompression. The `Compressor` adds some extra error handling, as well as some cli output including measurements of the time taken and the compression efficiency.
 
-`cli.py` implements the command-line interface using `argparser`. It is basically a simple command line interface for the `Compressor`.
+`cli.py` implements the command line interface using `argparser`. It is basically a simple wrapper around the `Compressor` class, providing a cli.
 
 # Performance
 TODO
