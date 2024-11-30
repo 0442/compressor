@@ -3,13 +3,18 @@
 Name                                          Stmts   Miss Branch BrPart  Cover   Missing
 -----------------------------------------------------------------------------------------
 compressor/__init__.py                            0      0      0      0   100%
-compressor/compression_methods/__init__.py        0      0      0      0   100%
-compressor/compression_methods/huffman.py       144     13     44      6    88%   43, 47-54, 169, 184, 203, 216, 231, 286->288
-compressor/compression_methods/interface.py       7      0      0      0   100%
+compressor/compression_methods/__init__.py        2      0      0      0   100%
+compressor/compression_methods/huffman.py       154     17     50      8    86%   52, 56-63, 181, 201, 229, 265, 276, 307, 336, 355-356, 369->371
+compressor/compression_methods/interface.py       8      0      0      0   100%
+compressor/compression_methods/lzw.py            74      6     30      7    86%   42->47, 51->55, 78, 91, 104, 119-122, 126->129
 tests/__init__.py                                 0      0      0      0   100%
-tests/test_huffman_tree.py                       50      0      0      0   100%
+tests/huffman/__init__.py                         0      0      0      0   100%
+tests/huffman/test_huffman.py                    52      0      0      0   100%
+tests/huffman/testing_constants.py                9      0      0      0   100%
+tests/lzw/__init__.py                             0      0      0      0   100%
+tests/lzw/test_lzw.py                            50      0      0      0   100%
 -----------------------------------------------------------------------------------------
-TOTAL                                           201     13     44      6    91%
+TOTAL                                           349     23     80     15    90%
 ```
 
 
@@ -25,7 +30,9 @@ Tested the following:
 * Tested the combination of compression and decompression with a random string of 1000 printable ascii characters. The original text is exactly the same after being compressed and decompressed.
 
 ## LZW
-* TODO
+* Tested handling of empty inputs for both compression and decompression.
+* Tested the combination of compresion and decompression with the short text input `TOBEORNOTTOBEORTOBEORNOT`
+* Tested the combination of compression and decompression with a random string of 1000 printable ascii characters. The original text is exactly the same after being compressed and decompressed.
 
 # Testing instructions
 install and set up the projcect first, see the [installation instructions](/README.md#installation)
