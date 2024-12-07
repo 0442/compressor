@@ -20,9 +20,7 @@ def test_file_compressor_roundtrip_lzw(tmp_path: Path, fc: FileCompressor):
     tmp_compressed = tmp_path / "compressed.lzw"
     tmp_decompressed = tmp_path / "decompressed.txt"
 
-    fc = FileCompressor()
     fc.compress(str(LONG_TEXT_FILE), str(tmp_compressed), method)
-
     fc.decompress(str(tmp_compressed), str(tmp_decompressed), method)
 
     assert filecmp.cmp(LONG_TEXT_FILE, tmp_decompressed)
@@ -35,7 +33,6 @@ def test_file_compressor_roundtrip_huffman(tmp_path: Path, fc: FileCompressor):
     tmp_decompressed = tmp_path / "decompressed.txt"
 
     fc.compress(str(LONG_TEXT_FILE), str(tmp_compressed), method)
-
     fc.decompress(str(tmp_compressed), str(tmp_decompressed), method)
 
     assert filecmp.cmp(LONG_TEXT_FILE, tmp_decompressed)
@@ -59,10 +56,14 @@ def test_file_compressor_output_file_exists(tmp_path: Path, fc: FileCompressor):
     h = Huffman()
     with raises(FileCompressionError, match="already exists"):
         fc.compress(str(i_file), str(o_file), h)
+    with raises(FileCompressionError, match="already exists"):
+        fc.decompress(str(i_file), str(o_file), h)
 
     lzw = LZW()
     with raises(FileCompressionError, match="already exists"):
         fc.compress(str(i_file), str(o_file), lzw)
+    with raises(FileCompressionError, match="already exists"):
+        fc.decompress(str(i_file), str(o_file), lzw)
 
     # Make sure the contents were not affected
     with open(o_file, "r", encoding="ascii") as o:
@@ -79,10 +80,14 @@ def test_file_compressor_input_file_not_exists(tmp_path: Path, fc: FileCompresso
     h = Huffman()
     with raises(FileCompressionError, match="^Input file '.*' does not exist.$"):
         fc.compress(str(i_file), str(o_file), h)
+    with raises(FileCompressionError, match="^Input file '.*' does not exist.$"):
+        fc.decompress(str(i_file), str(o_file), h)
 
     lzw = LZW()
     with raises(FileCompressionError, match="^Input file '.*' does not exist.$"):
         fc.compress(str(i_file), str(o_file), lzw)
+    with raises(FileCompressionError, match="^Input file '.*' does not exist.$"):
+        fc.decompress(str(i_file), str(o_file), lzw)
 
     # Make sure neither file was created
     assert not path.exists(i_file)
