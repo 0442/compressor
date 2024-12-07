@@ -8,7 +8,7 @@ from compressor.compression_methods.interface import CompressionMethodError
 from .compression_methods.interface import CompressionMethod
 
 
-class CompressionError(Exception):
+class FileCompressionError(Exception):
     """Represents an error during compression."""
 
 
@@ -31,7 +31,7 @@ def _command_wrapper(
     ) -> None:
         # Make sure output file does not exist.
         if path.exists(output_path):
-            raise CompressionError(f"File '{output_path}' already exists")
+            raise FileCompressionError(f"File '{output_path}' already exists")
 
         try:
             start = process_time()
@@ -39,14 +39,16 @@ def _command_wrapper(
             end = process_time()
             print(f"Compression took {end-start:.2f}s")
         except FileNotFoundError as e:
-            raise CompressionError(f"Input file does not exist: '{e.filename}'") from e
+            raise FileCompressionError(
+                f"Input file does not exist: '{e.filename}'"
+            ) from e
         except CompressionMethodError as e:
-            raise CompressionError(e) from e
+            raise FileCompressionError(e) from e
 
     return wrapper
 
 
-class Compressor:
+class FileCompressor:
     """A wrapper around CompressionMethods with added functionality."""
 
     @_command_wrapper
