@@ -1,5 +1,8 @@
 from argparse import ArgumentParser, Namespace
 import sys
+from typing import Callable
+
+from compressor.compressor import CompressionError
 
 from .compression_methods import Huffman, LZW
 from .compressor import Compressor
@@ -36,6 +39,21 @@ def get_args(methods: list[str]) -> Namespace:
     return args
 
 
+def error_handler(func: Callable[[], None]):
+    """Wrapper for use with the `run` function for handling errors."""
+
+    def wrapper():
+        try:
+            func()
+        except CompressionError as e:
+            print(e)
+        except Exception as e:
+            print(f"An unexpected error occured: {e}")
+
+    return wrapper
+
+
+@error_handler
 def run() -> None:
     """Run the command line interface for the compressor."""
     methods = {"huffman": Huffman(), "lzw": LZW()}
@@ -45,16 +63,13 @@ def run() -> None:
     method = methods.get(args.method, None)
 
     if not method:
-        print("Invalid method")
-        sys.exit(1)
+        raise ValueError("Invalid method")
 
     if not args.input_file:
-        print("Invalid input file")
-        sys.exit(1)
+        raise ValueError("Invalid input file")
 
     if not args.output_file:
-        print("Invalid output file")
-        sys.exit(1)
+        raise ValueError("Invalid output file")
 
     if args.command == "compress":
         compressor.compress(args.input_file, args.output_file, method)

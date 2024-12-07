@@ -2,7 +2,7 @@ from typing import TextIO, BinaryIO, override
 from heapq import heappop, heappush
 from bitarray import bitarray
 
-from .interface import CompressionMethod, CompressionError
+from .interface import CompressionMethod, CompressionMethodError
 
 
 class HuffmanTreeNode:
@@ -285,7 +285,7 @@ class Huffman(CompressionMethod):
             bin_in (BinaryIO): Object from which to read compressed text.
 
         Raises:
-            CompressionError: If compressed content is invalid.
+            CompressionMethodError: If compressed content is invalid.
 
         Returns:
             tuple[int, int]: A tuple containing the length of padding and the tree, in bytes.
@@ -304,7 +304,7 @@ class Huffman(CompressionMethod):
             or padding_len >= 8
             or tree_len > len(bin_in.read())
         ):
-            raise CompressionError(
+            raise CompressionMethodError(
                 "Invalid header: padding_len or tree_len out of bounds. "
                 + "Make sure the file is a valid compressed file."
             )
@@ -353,7 +353,7 @@ class Huffman(CompressionMethod):
             _ = bin_out.write(encoded_text.tobytes())
 
         except UnicodeDecodeError as e:
-            raise CompressionError(
+            raise CompressionMethodError(
                 f"Invalid file format. Must be {e.encoding} encoded."
             ) from e
 

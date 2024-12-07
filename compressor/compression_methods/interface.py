@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from typing import TextIO, BinaryIO
 
 
-class CompressionError(Exception):
-    """Represents an error during compression."""
+class CompressionMethodError(Exception):
+    """Represents an error from a compression method."""
 
 
 class CompressionMethod(ABC):
@@ -16,6 +16,9 @@ class CompressionMethod(ABC):
         Args:
             text_in (TextIO): TextIO object from which compressable text data is read.
             bin_out (BinaryIO): BinaryIO object to which compressed output is written to.
+
+        Raises:
+            CompressionMethodError: Raises this error if unable to perform the compression method.
         """
 
     @abstractmethod
@@ -25,4 +28,7 @@ class CompressionMethod(ABC):
         Args:
             bin_in (BinaryIO): BinaryIO object from which compressed data is read.
             text_out (TextIO): TextIO object to which decompressed text output is written to.
+
+        Raises:
+            CompressionMethodError: Raises this error if unable to perform the compression method.
         """

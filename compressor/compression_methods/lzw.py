@@ -1,7 +1,7 @@
 from typing import TextIO, BinaryIO, override
 from bitarray import bitarray
 
-from .interface import CompressionMethod, CompressionError
+from .interface import CompressionMethod, CompressionMethodError
 
 
 class LZW(CompressionMethod):
@@ -75,7 +75,9 @@ class LZW(CompressionMethod):
         # Read the padding header (1 byte)
         padding_len_byte = bin_in.read(1)
         if len(padding_len_byte) != 1:
-            raise CompressionError("Invalid input file format or empty file.")
+            raise CompressionMethodError(
+                "Invalid input file header: missing padding length byte."
+            )
 
         padding_len = padding_len_byte[0]
 
@@ -119,7 +121,7 @@ class LZW(CompressionMethod):
             elif code == dict_size:
                 entry = char_seq + char_seq[:1]
             else:
-                raise CompressionError(f"Bad code: {code}")
+                raise CompressionMethodError(f"Bad code: {code}")
 
             output_chars.append(entry)
 
