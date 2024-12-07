@@ -310,7 +310,7 @@ class Huffman(CompressionMethod):
             )
 
         # Move pointer back to the start of the tree
-        _ = bin_in.seek(16, 0)
+        bin_in.seek(16, 0)
 
         return padding_len, tree_len
 
@@ -320,9 +320,9 @@ class Huffman(CompressionMethod):
         # Note: to allow more memory-efficient handling of larger files,
         # might want to consider using generators in some places.
         try:
-            _ = text_in.seek(0)
+            text_in.seek(0)
             freq_list = self._count_frequencies(text_in)
-            _ = text_in.seek(0)
+            text_in.seek(0)
             tree = self._build_huffman_tree(freq_list)
             if tree is None:
                 return
@@ -348,9 +348,9 @@ class Huffman(CompressionMethod):
 
             header = padding_len_info + tree_len_info
 
-            _ = bin_out.write(header)
-            _ = bin_out.write(encoded_tree)
-            _ = bin_out.write(encoded_text.tobytes())
+            bin_out.write(header)
+            bin_out.write(encoded_tree)
+            bin_out.write(encoded_text.tobytes())
 
         except UnicodeDecodeError as e:
             raise CompressionMethodError(
@@ -369,4 +369,4 @@ class Huffman(CompressionMethod):
         if padding_len > 0:
             encoded_text_bits = encoded_text_bits[:-padding_len]
         decoded_text = self._decode(tree_str, encoded_text_bits)
-        _ = text_out.write(decoded_text)
+        text_out.write(decoded_text)

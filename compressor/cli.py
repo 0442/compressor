@@ -22,17 +22,17 @@ def get_args(methods: list[str]) -> Namespace:
     cmd_parser = arg_parser.add_subparsers(
         dest="command", metavar="command", required=True
     )
-    _ = cmd_parser.add_parser(
+    cmd_parser.add_parser(
         name="compress",
         help="Compress a file",
     )
-    _ = cmd_parser.add_parser(
+    cmd_parser.add_parser(
         name="decompress",
         help="Decompress a file",
     )
-    _ = arg_parser.add_argument(dest="method", type=str, choices=methods)
-    _ = arg_parser.add_argument(dest="input_file", type=str)
-    _ = arg_parser.add_argument(dest="output_file", type=str)
+    arg_parser.add_argument(dest="method", type=str, choices=methods)
+    arg_parser.add_argument(dest="input_file", type=str)
+    arg_parser.add_argument(dest="output_file", type=str)
 
     args = arg_parser.parse_args()
 
@@ -57,7 +57,6 @@ def error_handler(func: Callable[[], None]):
 def run() -> None:
     """Run the command line interface for the compressor."""
     methods = {"huffman": Huffman(), "lzw": LZW()}
-    file_compressor = FileCompressor()
     args = get_args(list(methods.keys()))
 
     method = methods.get(args.method, None)
@@ -65,6 +64,7 @@ def run() -> None:
     if not (method and args.input_file and args.output_file and args.command):
         raise ValueError("Invalid args")
 
+    file_compressor = FileCompressor()
     input_path = Path(args.input_file)
     output_path = Path(args.output_file)
 
