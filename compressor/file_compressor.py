@@ -40,7 +40,7 @@ def _command_wrapper(
             print(f"Compression took {end-start:.2f}s")
         except FileNotFoundError as e:
             raise FileCompressionError(
-                f"Input file does not exist: '{e.filename}'"
+                f"Input file '{e.filename}' does not exist."
             ) from e
         except CompressionMethodError as e:
             raise FileCompressionError(e) from e
