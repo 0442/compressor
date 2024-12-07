@@ -20,7 +20,8 @@ def _command_wrapper(
     Checks whether output file exists and handles errors.
 
     Args:
-        func (Callable[[Any, str, str, CompressionMethod], None]): Either the `compress` or `decompress` method.
+        func (Callable[[Any, str, str, CompressionMethod], None]):
+        Either the `compress` or `decompress` method.
 
     Returns:
         Callable[[Any, str, str, CompressionMethod], None]: the wrapper

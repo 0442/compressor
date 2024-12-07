@@ -1,6 +1,5 @@
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
-import sys
 from typing import Callable
 
 from compressor.file_compressor import FileCompressionError
@@ -63,14 +62,8 @@ def run() -> None:
 
     method = methods.get(args.method, None)
 
-    if not method:
-        raise ValueError("Invalid method")
-
-    if not args.input_file:
-        raise ValueError("Invalid input file")
-
-    if not args.output_file:
-        raise ValueError("Invalid output file")
+    if not (method and args.input_file and args.output_file and args.command):
+        raise ValueError("Invalid args")
 
     input_path = Path(args.input_file)
     output_path = Path(args.output_file)

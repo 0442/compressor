@@ -7,9 +7,9 @@ from .interface import CompressionMethod, CompressionMethodError
 class LZW(CompressionMethod):
     """Implements the LZW compression algorithm as a CompressionMethod."""
 
-    MAX_DICT_SIZE = 4096
-    CODE_SIZE = 12  # Size in bits
-    INITIAL_DICT_SIZE = 256
+    _MAX_DICT_SIZE = 4096
+    _CODE_SIZE = 12  # Size in bits
+    _INITIAL_DICT_SIZE = 256
 
     @override
     def compress(self, text_in: TextIO, bin_out: BinaryIO) -> None:
@@ -25,8 +25,8 @@ class LZW(CompressionMethod):
 
         # Initialize the dictionary of char sequence codes with single char ASCII
         # Char seq -> code
-        dictionary = {chr(i): i for i in range(self.INITIAL_DICT_SIZE)}
-        cur_dict_size = self.INITIAL_DICT_SIZE
+        dictionary = {chr(i): i for i in range(self._INITIAL_DICT_SIZE)}
+        cur_dict_size = self._INITIAL_DICT_SIZE
 
         cur_char_seq = ""
         output_codes: list[int] = []
@@ -39,7 +39,7 @@ class LZW(CompressionMethod):
                 output_codes.append(dictionary[cur_char_seq])
 
                 # If room in dict, add the new one, which did not yet exist
-                if cur_dict_size < self.MAX_DICT_SIZE:
+                if cur_dict_size < self._MAX_DICT_SIZE:
                     dictionary[new_char_seq] = cur_dict_size
                     cur_dict_size += 1
 
@@ -54,7 +54,7 @@ class LZW(CompressionMethod):
         # Pack the codes into bits
         bits = bitarray(endian="big")
         for code in output_codes:
-            bits.extend(bin(code)[2:].zfill(self.CODE_SIZE))
+            bits.extend(bin(code)[2:].zfill(self._CODE_SIZE))
 
         # Calculate required padding
         padding_len = (8 - (len(bits) % 8)) % 8
@@ -92,15 +92,15 @@ class LZW(CompressionMethod):
         if padding_len > 0:
             bits = bits[:-padding_len]
 
-        # Extract self.CODE_SIZE -bit codes from bits
+        # Extract self._CODE_SIZE -bit codes from bits
         result_codes: list[int] = []
         i = 0
         total_bits = len(bits)
-        while i + self.CODE_SIZE <= total_bits:
-            code_bits = bits[i : i + self.CODE_SIZE]
+        while i + self._CODE_SIZE <= total_bits:
+            code_bits = bits[i : i + self._CODE_SIZE]
             code = int(code_bits.to01(), 2)
             result_codes.append(code)
-            i += self.CODE_SIZE
+            i += self._CODE_SIZE
 
         if not result_codes:
             return
@@ -108,8 +108,8 @@ class LZW(CompressionMethod):
         # Start decompressing
 
         # Code -> char seq
-        dictionary = {i: chr(i) for i in range(self.INITIAL_DICT_SIZE)}
-        dict_size = self.INITIAL_DICT_SIZE
+        dictionary = {i: chr(i) for i in range(self._INITIAL_DICT_SIZE)}
+        dict_size = self._INITIAL_DICT_SIZE
 
         char_seq = dictionary[result_codes[0]]
 
@@ -125,7 +125,7 @@ class LZW(CompressionMethod):
 
             output_chars.append(entry)
 
-            if dict_size < self.MAX_DICT_SIZE:
+            if dict_size < self._MAX_DICT_SIZE:
                 dictionary[dict_size] = char_seq + entry[:1]
                 dict_size += 1
             char_seq = entry
