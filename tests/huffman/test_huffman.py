@@ -1,38 +1,32 @@
+from pytest import fixture
 from io import BytesIO, StringIO
-from random import randrange
-from string import printable
+from pathlib import Path
+from filecmp import cmp
 
 from compressor.compression_methods.huffman import Huffman, HuffmanTreeNode
 
-from .testing_constants import (
+from .constants import (
     TEST_STRING_SHORT,
     TEST_STRING_SHORT_CHAR_FREQS,
     TEST_STRING_SHORT_COMPRESSED,
     TEST_STRING_SHORT_HUFFMAN_TREE,
     TEST_STRING_SHORT_HUFFMAN_CODES,
 )
+from ..common import LONG_TEXT_FILE
 
 
-def test_decompression_with_short_input():
-    h = Huffman()
-
-    i = BytesIO(TEST_STRING_SHORT_COMPRESSED)
-    o = StringIO()
-    h.decompress(i, o)
-    o.seek(0)
-    assert o.read() == TEST_STRING_SHORT
+@fixture
+def h():
+    return Huffman()
 
 
-def test_frequency_counter_with_short_input():
-    h = Huffman()
+def test_frequency_counter_short_input(h: Huffman):
     a = StringIO(TEST_STRING_SHORT)
     f = h._count_frequencies(a)
     assert set(f) == set(TEST_STRING_SHORT_CHAR_FREQS)
 
 
-def test_huffman_tree_building_with_short_input():
-    h = Huffman()
-
+def test_huffman_tree_with_short_input(h: Huffman):
     # Multiple ways to arrange the tree in terms of character position,
     # as characters may have the same frequency.
     # Position of frequencies is important though, so those are tested for.
@@ -44,16 +38,20 @@ def test_huffman_tree_building_with_short_input():
     test_tree(tree, TEST_STRING_SHORT_HUFFMAN_TREE)
 
 
-def test_huffman_coding():
-    h = Huffman()
-
+def test_huffman_coding(h: Huffman):
     codes = h._get_codes(TEST_STRING_SHORT_HUFFMAN_TREE)
     assert codes == TEST_STRING_SHORT_HUFFMAN_CODES
 
 
-def test_compression_with_short_input():
-    h = Huffman()
+def test_decompression_short_input(h: Huffman):
+    i = BytesIO(TEST_STRING_SHORT_COMPRESSED)
+    o = StringIO()
+    h.decompress(i, o)
+    o.seek(0)
+    assert o.read() == TEST_STRING_SHORT
 
+
+def test_compression_short_input(h: Huffman):
     i = StringIO(TEST_STRING_SHORT)
     o = BytesIO()
     h.compress(i, o)
@@ -61,9 +59,7 @@ def test_compression_with_short_input():
     assert o.read() == TEST_STRING_SHORT_COMPRESSED
 
 
-def test_compression_with_empty_input():
-    h = Huffman()
-
+def test_compression_empty_input(h: Huffman):
     i = StringIO("")
     o = BytesIO()
     h.compress(i, o)
@@ -71,18 +67,19 @@ def test_compression_with_empty_input():
     assert o.read() == b""
 
 
-def test_compression_and_decompression_with_short_input():
-    h = Huffman()
-    original = StringIO(
-        "".join([printable[randrange(0, len(printable))] for _ in range(1000)])
-    )
-    compressed = BytesIO()
-    result = StringIO()
+def test_roundtrip_with_large_input(h: Huffman, tmp_path: Path):
+    tmp_comp_file = tmp_path / "compressed.huffman"
+    tmp_decomp_file = tmp_path / "decompressed.txt"
 
-    h.compress(original, compressed)
-    compressed.seek(0)
-    original.seek(0)
-    h.decompress(compressed, result)
-    result.seek(0)
+    with open(LONG_TEXT_FILE, "r", encoding="utf-8") as original:
+        with open(tmp_comp_file, "wb") as compressed:
+            h.compress(original, compressed)
+            compressed.seek(0)
 
-    assert result.read() == original.read()
+        with open(tmp_comp_file, "rb") as compressed:
+            with open(tmp_decomp_file, "w", encoding="utf-8") as decompressed:
+                h.decompress(compressed, decompressed)
+                original.seek(0)
+                decompressed.seek(0)
+
+    assert cmp(LONG_TEXT_FILE, tmp_decomp_file)
