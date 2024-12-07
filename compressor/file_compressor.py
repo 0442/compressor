@@ -2,6 +2,7 @@ from typing import Any, Callable, TextIO, BinaryIO
 from os import path
 from time import process_time
 from functools import wraps
+from pathlib import Path
 
 from compressor.compression_methods.interface import CompressionMethodError
 
@@ -13,8 +14,8 @@ class FileCompressionError(Exception):
 
 
 def _command_wrapper(
-    func: Callable[[Any, str, str, CompressionMethod], None]
-) -> Callable[[Any, str, str, CompressionMethod], None]:
+    func: Callable[[Any, Path, Path, CompressionMethod], None]
+) -> Callable[[Any, Path, Path, CompressionMethod], None]:
     """Returns a wrapper for use with both the compression and decompression methods.
     Checks whether output file exists and handles errors.
 
@@ -27,11 +28,11 @@ def _command_wrapper(
 
     @wraps(func)
     def wrapper(
-        self: Any, input_path: str, output_path: str, method: CompressionMethod
+        self: Any, input_path: Path, output_path: Path, method: CompressionMethod
     ) -> None:
         # Make sure output file does not exist.
         if path.exists(output_path):
-            raise FileCompressionError(f"File '{output_path}' already exists")
+            raise FileCompressionError(f"Path '{output_path}' already exists")
 
         try:
             start = process_time()
@@ -53,7 +54,7 @@ class FileCompressor:
 
     @_command_wrapper
     def compress(
-        self, input_path: str, output_path: str, method: CompressionMethod
+        self, input_path: Path, output_path: Path, method: CompressionMethod
     ) -> None:
         """Compresses the input file using provided method.
 
@@ -69,7 +70,7 @@ class FileCompressor:
 
     @_command_wrapper
     def decompress(
-        self, input_path: str, output_path: str, method: CompressionMethod
+        self, input_path: Path, output_path: Path, method: CompressionMethod
     ) -> None:
         """Decompresses the input file using provided method.
 

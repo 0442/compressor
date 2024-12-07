@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, Namespace
+from pathlib import Path
 import sys
 from typing import Callable
 
@@ -71,7 +72,10 @@ def run() -> None:
     if not args.output_file:
         raise ValueError("Invalid output file")
 
+    input_path = Path(args.input_file)
+    output_path = Path(args.output_file)
+
     if args.command == "compress":
-        file_compressor.compress(args.input_file, args.output_file, method)
+        file_compressor.compress(input_path, output_path, method)
     elif args.command == "decompress":
-        file_compressor.decompress(args.input_file, args.output_file, method)
+        file_compressor.decompress(input_path, output_path, method)
