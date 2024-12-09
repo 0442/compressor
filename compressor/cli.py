@@ -1,3 +1,4 @@
+import sys
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from typing import Callable
@@ -6,6 +7,10 @@ from compressor.file_compressor import FileCompressionError
 
 from .compression_methods import Huffman, LZW
 from .file_compressor import FileCompressor
+
+from .utils.logging import LOGFILE, get_logger
+
+logger = get_logger(__name__)
 
 
 def get_args(methods: list[str]) -> Namespace:
@@ -39,16 +44,27 @@ def get_args(methods: list[str]) -> Namespace:
     return args
 
 
-def error_handler(func: Callable[[], None]):
-    """Wrapper for use with the `run` function for handling errors."""
+def error_handler(run_func: Callable[[], None]):
+    """Decorator for use with the cli `run` function for handling errors."""
 
     def wrapper():
         try:
-            func()
+            return run_func()
         except FileCompressionError as e:
-            print(e)
+            logger.error("Compression failed: %s", e)
+            print("Compression failed:", e)
+            logger.exception(e)
+        except KeyboardInterrupt as e:
+            logger.error("Compression canceled by user")
+            print("Compression canceled")
+            logger.exception(e)
         except Exception as e:
+            logger.critical("An unexpected error occured: %s", e)
             print(f"An unexpected error occured: {e}")
+            print(f"See '{LOGFILE}' for more details.")
+            logger.exception(e)
+
+        sys.exit(1)
 
     return wrapper
 

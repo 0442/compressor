@@ -4,13 +4,16 @@ from time import process_time
 from functools import wraps
 from pathlib import Path
 
-from compressor.compression_methods.interface import CompressionMethodError
-
+from .compression_methods.interface import CompressionMethodError
 from .compression_methods.interface import CompressionMethod
+from .utils.logging import get_logger
+
+
+logger = get_logger(__name__)
 
 
 class FileCompressionError(Exception):
-    """Represents an error during compression."""
+    """Error in file compression."""
 
 
 def _command_wrapper(
@@ -20,17 +23,21 @@ def _command_wrapper(
     Checks whether output file exists and handles errors.
 
     Args:
-        func (Callable[[Any, str, str, CompressionMethod], None]):
+        func (Callable[[Any, Path, Path, CompressionMethod], None]):
         Either the `compress` or `decompress` method.
 
     Returns:
-        Callable[[Any, str, str, CompressionMethod], None]: the wrapper
+        Callable[[Any, Path, Path, CompressionMethod], None]: the wrapper
     """
 
     @wraps(func)
     def wrapper(
         self: Any, input_path: Path, output_path: Path, method: CompressionMethod
     ) -> None:
+        logger.debug("Compression method: '%s'", repr(method))
+        logger.debug("Input path: '%s'", input_path)
+        logger.debug("Output path: '%s'", output_path)
+
         # Make sure output file does not exist.
         if path.exists(output_path):
             raise FileCompressionError(f"Path '{output_path}' already exists")
@@ -42,8 +49,10 @@ def _command_wrapper(
             print(f"Compression took {end-start:.2f}s")
         except FileNotFoundError as e:
             raise FileCompressionError(
-                f"Input file '{e.filename}' does not exist."
+                f"Input file '{e.filename}' does not exist"
             ) from e
+        except PermissionError as e:
+            raise FileCompressionError(f"Permission denied: '{e.filename}'") from e
         except CompressionMethodError as e:
             raise FileCompressionError(e) from e
 
@@ -94,6 +103,9 @@ class FileCompressor:
         """
         decomp_size = decompressed.tell()
         comp_size = compressed.tell()
+
+        logger.debug("Size (decompressed): %s KB", f"{decomp_size/1024:.2f}")
+        logger.debug("Size (compressed): %s KB", f"{comp_size/1024:.2f}")
 
         print(f"Size (decompressed): {decomp_size/1024:.2f} KB")
         print(f"Size (compressed): {comp_size/1024:.2f} KB")
