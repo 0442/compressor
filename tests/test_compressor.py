@@ -20,8 +20,8 @@ def test_file_compressor_roundtrip_lzw(tmp_path: Path, fc: FileCompressor):
     tmp_compressed = tmp_path / "compressed.lzw"
     tmp_decompressed = tmp_path / "decompressed.txt"
 
-    fc.compress(str(LONG_TEXT_FILE), str(tmp_compressed), method)
-    fc.decompress(str(tmp_compressed), str(tmp_decompressed), method)
+    fc.compress(LONG_TEXT_FILE, tmp_compressed, method)
+    fc.decompress(tmp_compressed, tmp_decompressed, method)
 
     assert filecmp.cmp(LONG_TEXT_FILE, tmp_decompressed)
 
@@ -32,8 +32,8 @@ def test_file_compressor_roundtrip_huffman(tmp_path: Path, fc: FileCompressor):
     tmp_compressed = tmp_path / "compressed.huffman"
     tmp_decompressed = tmp_path / "decompressed.txt"
 
-    fc.compress(str(LONG_TEXT_FILE), str(tmp_compressed), method)
-    fc.decompress(str(tmp_compressed), str(tmp_decompressed), method)
+    fc.compress(LONG_TEXT_FILE, tmp_compressed, method)
+    fc.decompress(tmp_compressed, tmp_decompressed, method)
 
     assert filecmp.cmp(LONG_TEXT_FILE, tmp_decompressed)
 
@@ -55,15 +55,15 @@ def test_file_compressor_output_file_exists(tmp_path: Path, fc: FileCompressor):
     # Both compression methods should throw an error saying the file already exists
     h = Huffman()
     with raises(FileCompressionError, match="already exists"):
-        fc.compress(str(i_file), str(o_file), h)
+        fc.compress(i_file, o_file, h)
     with raises(FileCompressionError, match="already exists"):
-        fc.decompress(str(i_file), str(o_file), h)
+        fc.decompress(i_file, o_file, h)
 
     lzw = LZW()
     with raises(FileCompressionError, match="already exists"):
-        fc.compress(str(i_file), str(o_file), lzw)
+        fc.compress(i_file, o_file, lzw)
     with raises(FileCompressionError, match="already exists"):
-        fc.decompress(str(i_file), str(o_file), lzw)
+        fc.decompress(i_file, o_file, lzw)
 
     # Make sure the contents were not affected
     with open(o_file, "r", encoding="ascii") as o:
@@ -78,16 +78,16 @@ def test_file_compressor_input_file_not_exists(tmp_path: Path, fc: FileCompresso
     i_file = tmp_path / "i_file"
 
     h = Huffman()
-    with raises(FileCompressionError, match="^Input file '.*' does not exist.$"):
-        fc.compress(str(i_file), str(o_file), h)
-    with raises(FileCompressionError, match="^Input file '.*' does not exist.$"):
-        fc.decompress(str(i_file), str(o_file), h)
+    with raises(FileCompressionError, match="^Input file '.*' does not exist$"):
+        fc.compress(i_file, o_file, h)
+    with raises(FileCompressionError, match="^Input file '.*' does not exist$"):
+        fc.decompress(i_file, o_file, h)
 
     lzw = LZW()
-    with raises(FileCompressionError, match="^Input file '.*' does not exist.$"):
-        fc.compress(str(i_file), str(o_file), lzw)
-    with raises(FileCompressionError, match="^Input file '.*' does not exist.$"):
-        fc.decompress(str(i_file), str(o_file), lzw)
+    with raises(FileCompressionError, match="^Input file '.*' does not exist$"):
+        fc.compress(i_file, o_file, lzw)
+    with raises(FileCompressionError, match="^Input file '.*' does not exist$"):
+        fc.decompress(i_file, o_file, lzw)
 
     # Make sure neither file was created
     assert not path.exists(i_file)
